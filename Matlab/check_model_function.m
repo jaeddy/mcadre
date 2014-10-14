@@ -1,28 +1,30 @@
-function [requiredMetsStatus,time] = checkModelFunction(model, varargin)
+function [requiredMetsStatus, time] = check_model_function(model, varargin)
 
 % Inputs
 % - model:
 % - optional inputs:
-%       'requiredMets',metList
-%       'biomass',biomassRxn
-%       'media',mediaDef
+%       'requiredMets', metList
+%       'biomass', biomassRxn
+%       'media', mediaDef
 
 %% Parse input parameters
 
 if numel(varargin)
-    if rem(numel(varargin),2) == 0;
+    if rem(numel(varargin), 2) == 0
         options = {'requiredMets', 'biomass', 'media'};
         for i = 1:2:numel(varargin)
             argname = varargin{i}; argval = varargin{i + 1};
-            option = find(strncmpi(argname,options,numel(argname)));
+            option = find(strncmpi(argname, options, numel(argname)));
             if ~isempty(option)
                 switch option
                     case 1
                         metList = argval;
                     case 2
-                        biomassRxn = argval;
+                        error('%s option not yet implemented.', argname);
+                        % biomassRxn = argval;
                     case 3
-                        mediaDef = argval;
+                        error('%s option not yet implemented.', argname);
+                        % mediaDef = argval;
                 end
             else error('Unknown option %s.', argname)
             end
@@ -42,7 +44,7 @@ indExRxns = indOutRxns | indInRxns;
 exRxns = model.rxns(indExRxns);
 
 if exist('mediaDef')
-    model = set_media_ex_bounds(model);
+    model = set_media_ex_bounds(model); % not implemented in this version
 else
     model = set_organic_met_bounds(model);
 end

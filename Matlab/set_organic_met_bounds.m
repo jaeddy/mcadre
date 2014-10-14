@@ -1,4 +1,4 @@
-function model = set_organic_met_bounds(model)
+function model = set_organic_met_bounds(model, exRxns)
 
 % Add a warning if the metFormulas field is empty
 carbonMets = ~cellfun('isempty', regexp(model.metFormulas, 'C'));
