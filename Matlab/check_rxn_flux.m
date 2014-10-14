@@ -1,16 +1,21 @@
 function inactiveRequired = check_rxn_flux(model, requiredRxns)
 
+% This function uses the heuristic speed-up proposed by Jerby et al. in the MBA
+% paper for performing a pseudo-FVA calculation.
+
 rxnList = requiredRxns;
 inactiveRequired = [];
 while numel(rxnList)
     numRxnList = numel(rxnList);
-    model.rxns(strmatch('biomass_', model.rxns));
+    % model.rxns(strmatch('biomass_', model.rxns)); % not implemented
     model = changeObjective(model, rxnList);
 
     % Maximize all
     FBAsolution = optimizeCbModel(model, 'max');
 
     optMax = FBAsolution.x;
+    % If no solution was achieved when trying to maximize all reactions, skip
+    % the subsequent step of checking individual reactions
     if isempty(optMax)
         inactiveRequired = 1;
         break;

@@ -38,15 +38,12 @@ end
 t0 = clock;
 
 % Identify exchange reactions in the model
-indOutRxns = sum(model.S > 0) > 0 & sum(model.S < 0) == 0;
-indInRxns = sum(model.S < 0) > 0 & sum(model.S > 0) == 0;
-indExRxns = indOutRxns | indInRxns;
-exRxns = model.rxns(indExRxns);
+exRxns = find_ex_rxns(model);
 
 if exist('mediaDef')
     model = set_media_ex_bounds(model); % not implemented in this version
 else
-    model = set_organic_met_bounds(model);
+    model = set_organic_met_bounds(model, exRxns);
 end
 
 % Add demand reactions for required metabolites
@@ -56,7 +53,7 @@ else requiredRxns = {};
 end
 
 if exist('biomassRxn')
-    requiredRxns = [requiredRxns, biomassRxn];
+    requiredRxns = [requiredRxns, biomassRxn]; % not implemented in this version
 end
 
 inactiveRequired = check_rxn_flux(model, requiredRxns);

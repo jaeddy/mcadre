@@ -1,7 +1,7 @@
 function [model, requiredRxns] = specify_required_rxns(model, metList)
 
 coaMets = {'accoa[m]'; 'succoa[m]'; 'pmtcoa[c]'};
-[model,addedRxns] = addDemandReaction(model, ...
+[model, addedRxns] = addDemandReaction(model, ...
     setdiff(metList, coaMets));
 
 % The following are not simple demand reactions, so must be added
