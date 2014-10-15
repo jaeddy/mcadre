@@ -1,4 +1,4 @@
-function [inactiveRxns, time, result] = checkModelConsistencyFast(model, r, C, deCheck, opt)
+function [inactiveRxns, time, result] = check_model_consistency(model, r, C, deCheck, method)
 
 
 % This function is designed to quickly identify dead-end reactions in a
@@ -82,7 +82,7 @@ if numel(deadEnd_C)
 % If the option is specified, fastFVA is used to quickly scan through all
 % reactions. **note: may want to include option to use fastFVA with GLPK
 else
-    inactiveRxns = find_inactive_rxns(model, method)
+    inactiveRxns = find_inactive_rxns(model, method);
 end
 
 time = etime(clock,t0);
