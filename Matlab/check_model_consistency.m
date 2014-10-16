@@ -60,7 +60,7 @@ rxnList = C;
 % This check potentially avoids sequential optimizations, as the function
 % can exit if any blocked core reactions are detected.
 if deCheck
-    deadEnd_C = check_core_deadends(model);
+    deadEnd_C = check_core_deadends(model, C);
 else
     deadEnd_C = [];
 end
@@ -86,4 +86,4 @@ else
 end
 
 time = etime(clock,t0);
-display(['checkModelConsistency time: ',num2str(time, '%1.2f'), ' s'])
+display(['check_model_consistency time: ',num2str(time, '%1.2f'), ' s'])

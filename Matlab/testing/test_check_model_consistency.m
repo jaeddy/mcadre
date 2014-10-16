@@ -25,6 +25,19 @@ display('---');
 % Check outputs; should find 1 dead-end-containing core reaction
 display('## Checking output of check_core_deadends with random core...');
 
+if exist('deadEnd_C', 'var')
+    if numel(deadEnd_C) == 1
+        display(['PASS...', ...
+            'Function check_core_deadend returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function check_core_deadend returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'Function check_core_deadend encountered error, cannot check output'])
+end
+
 
 %%
 
@@ -47,6 +60,18 @@ display('---');
 % Check outputs; should find no dead-end-containing core reactions
 display('## Checking output of check_core_deadends with small core...');
 
+if exist('deadEnd_C', 'var')
+    if numel(deadEnd_C) == 0
+        display(['PASS...', ...
+            'Function check_core_deadend returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function check_core_deadend returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'Function check_core_deadend encountered error, cannot check output'])
+end
 
 %% Test find_inactive_rxns
 
