@@ -1,4 +1,4 @@
-function [inactiveRxns, time, result] = check_model_consistency(model, r, C, deCheck, method)
+function [inactiveRxns, time, result] = check_model_consistency(model, method, r, deCheck, C)
 
 
 % This function is designed to quickly identify dead-end reactions in a
@@ -11,10 +11,12 @@ function [inactiveRxns, time, result] = check_model_consistency(model, r, C, deC
 
 % Inputs:
 % - model: COBRA model structure
-% - r: name of reaction to be removed (fo r model pruning)
-% - C: list of core reaction names (for model pruning)
-% - fast: parameter specifying whether to use fastFVA (1) or a heuristic
-%         speedup of the FVA algorithm (0) (optional)
+% (optional inputs:)
+% - method: parameter specifying whether to use fastFVA (1) or fastcc (2)
+% - r: name of reaction to be removed (for model pruning in mCADRE or MBA)
+% - deCheck: check for core reactions containing dead end metabolites (only for
+%            use with model pruning in MBA)
+% - C: list of core reaction names (only for model pruning in MBA)
 
 % Outputs:
 % - inactiveRxns: list of IDs corresponding to reactions with 0 mininum and
@@ -26,19 +28,18 @@ function [inactiveRxns, time, result] = check_model_consistency(model, r, C, deC
 %       2: removal of r created metabolite dead ends leading to
 %          inactivation of core reactions
 
-% When using the function independently, no additional inputs need to be
-% specified besides the model. However, to find all blocked reactions for a
-% model (i.e., not when pruning) with fastFVA, use the following syntax:
-%   [inactiveRxns,...] = checkModelConsistency(model,[],{},1);
-
 if nargin < 2
-    r = [];
-    C = {};
-    deCheck = 1;
     method = 1;
 end
 
+if nargin < 3
+    r = [];
+    deCheck = 0;
+    C = {};
+end
+
 if numel(r)
+    r
    % Remove reaction r from the model
     model = removeRxns(model, r);
 end
@@ -51,8 +52,6 @@ result = 1; % Until proven otherwise, assume that removal of r does not
             % create any metabolite dead ends
 
 %% First check whether any core reactions are blocked by the removal of r.
-
-rxnList = C;
 
 % Checking for metabolite dead ends is accomplished entirely by matrix
 % operations, and is therefore very fast in Matlab. If any core reaction
@@ -82,7 +81,8 @@ if numel(deadEnd_C)
 % If the option is specified, fastFVA is used to quickly scan through all
 % reactions. **note: may want to include option to use fastFVA with GLPK
 else
-    inactiveRxns = find_inactive_rxns(model, method);
+    length(model.rxns)
+    inactiveRxns = union(inactiveRxns, find_inactive_rxns(model, method));
 end
 
 time = etime(clock,t0);

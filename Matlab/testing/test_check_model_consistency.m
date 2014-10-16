@@ -4,6 +4,11 @@ changeCobraSolver('glpk');
 
 %% Test check_core_deadends
 
+% Note: this function isn't actually needed for mCADRE, but was originally
+% included to help speed up my code for running MBA. As mCADRE allows for the
+% removal of core reactions under some scenarios, this function shouldn't be
+% called with check_model_consistency (i.e., deCheck = 0).
+
 % Test with random core
 display('## Testing check_core_deadends with random core...');
 
@@ -38,9 +43,6 @@ else
         'Function check_core_deadend encountered error, cannot check output'])
 end
 
-
-%%
-
 % Test with small core which should contain no dead-end metabolites
 display('## Testing check_core_deadends with small core...');
 
@@ -72,6 +74,7 @@ else
     display(['FAIL...', ...
         'Function check_core_deadend encountered error, cannot check output'])
 end
+
 
 %% Test find_inactive_rxns
 
@@ -135,5 +138,144 @@ else
     display(['FAIL...', ...
         'Function find_inactive_rxns encountered error, cannot check output'])
 end
-        
+
+
 %% Test check_model_consistency
+
+% Test with fastFVA, default parameters
+method = 1;
+r = [];
+deCheck = 0;
+C = {};
+
+display('## Testing check_model_consistency with default inputs...');
+
+try
+    [inactiveRxns, time, result] = check_model_consistency(model, ...
+        method, r, deCheck, C);
+    display(['PASS...', ...
+        'Function check_model_consistency ran without error']);
+catch err
+    display(['FAIL...', ...
+        'Function check_model_consistency was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
+
+% Check outputs; should find 1273 inactive reactions in Recon 1
+display('## Checking output of check_model_consistency with default inputs...');
+
+if exist('inactiveRxns', 'var')
+    if numel(inactiveRxns) == 1273
+        display(['PASS...', ...
+            'Function check_model_consistency returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function check_model_consistency returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'Function check_model_consistency encountered error, no output'])
+end
+
+% Test with fastFVA, consistent model
+method = 1;
+r = [];
+deCheck = 0;
+C = {};
+
+display('## Testing check_model_consistency with consistent model...');
+
+try
+    [inactiveRxns, time, result] = check_model_consistency(model_consistent, ...
+        method, r, deCheck, C);
+    display(['PASS...', ...
+        'Function check_model_consistency ran without error']);
+catch err
+    display(['FAIL...', ...
+        'Function check_model_consistency was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
+
+% Check outputs; should find 0 inactive reactions in Recon 1
+display('## Checking output of check_model_consistency with default inputs...');
+
+if exist('inactiveRxns', 'var')
+    if numel(inactiveRxns) == 0
+        display(['PASS...', ...
+            'Function check_model_consistency returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function check_model_consistency returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'Function check_model_consistency encountered error, no output'])
+end
+
+% Test with fastFVA, using consistent model + removed reaction
+r = 'ACCOAC';
+
+display('## Testing check_model_consistency with reaction removed');
+
+try
+    [inactiveRxns, time, result] = check_model_consistency(model_consistent, ...
+        method, r, deCheck, C);
+    display(['PASS...', ...
+        'Function check_model_consistency ran without error']);
+catch err
+    display(['FAIL...', ...
+        'Function check_model_consistency was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
+
+% Check outputs; should find 13 inactive reactions in Recon 1
+display('## Checking output of check_model_consistency, reaction removed...');
+
+if exist('inactiveRxns', 'var')
+    if numel(inactiveRxns) == 13
+        display(['PASS...', ...
+            'Function check_model_consistency returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function check_model_consistency returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'Function check_model_consistency encountered error, no output'])
+end
+
+
+%%
+% Test with fastcc
+display('## Testing check_model_consistency with fastcc...');
+
+clear('inactiveRxns')
+try
+    [inactiveRxns, time, result] = check_model_consistency(model, 2);
+    display(['PASS...', ...
+        'Function check_model_consistency ran without error']);
+catch err
+    display(['FAIL...', ...
+        'Function check_model_consistency was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
+
+% Check outputs; should find 1273 inactive reactions in Recon 1
+display('## Checking output of check_model_consistency with fastFVA...');
+
+if exist('inactiveRxns', 'var')
+    if numel(inactiveRxns) == 1273
+        display(['PASS...', ...
+            'Function check_model_consistency returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function check_model_consistency returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'Function check_model_consistency encountered error, no output'])
+end
