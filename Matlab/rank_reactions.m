@@ -19,7 +19,7 @@ function [GM,C,NC,P,Z,inactiveRxns,model_C] = rank_reactions(model, G, U, confid
 
 %% Map high confidence genes to reactions
 if nargin > 4
-    is_C_H = map_high_conf_to_rxns(model, GPRmat, C_H_genes);
+    is_C_H = map_high_conf_to_rxns(model, GPRmat, GPRrxns, C_H_genes);
 else is_C_H = false(size(model.rxns));
 end
 

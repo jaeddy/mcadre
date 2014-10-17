@@ -49,19 +49,46 @@ if exist('GPRmat', 'var')
     end
 else
     display(['FAIL...', ...
-        'Function parse_gprs encountered error, cannot check output'])
+        'Function parse_gprs encountered error, cannot check output']);
 end
 
 %% Test map_high_conf_to_rxns
 
-is_C_H = map_high_conf_to_rxns(model, GPRmat, C_H_genes);
-try
-    is_C_H = map_high_conf_to_rxns(model, GPRmat, C_H_genes);
-    display(['PASS...', ...
-        'Function parse_gprs ran without error']);
-catch err
+% Test with results from parse_gprs and high-confidence core from U87
+display('## Testing map_high_conf_to_rxns...');
+
+if exist('GPRmat', 'var')
+    try
+        is_C_H = map_high_conf_to_rxns(model, GPRmat, GPRrxns, C_H_genes);
+        display(['PASS...', ...
+            'Function map_high_conf_to_rxns ran without error']);
+    catch err
+        display(['FAIL...', ...
+            'Function map_high_conf_to_rxns was terminated with the error:']);
+        display(['> ', err.message]);
+    end
+else
     display(['FAIL...', ...
-        'Function parse_gprs was terminated with the error:']);
-    display(['> ', err.message]);
+        'GPRmat missing, cannot check map_high_conf_to_rxns']);
 end
 display('---');
+
+
+% Check outputs for small GPRmat
+display('## Checking output of map_high_conf_to_rxns...');
+
+if exist('is_C_H', 'var')
+    if sum(is_C_H) == 2
+        display(['PASS...', ...
+            'Function map_high_conf_to_rxns returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function map_high_conf_to_rxns returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'No output to check from function map_high_conf_to_rxns']);
+end
+
+
+%% Test map_gene_scores_to_rxns

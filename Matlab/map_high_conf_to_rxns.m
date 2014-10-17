@@ -1,4 +1,4 @@
-function is_C_H = map_high_conf_to_rxns(model, GPRmat, C_H_genes)
+function is_C_H = map_high_conf_to_rxns(model, GPRmat, GPRrxns, C_H_genes)
 
 C_H_GPR = double(ismember(GPRmat, C_H_genes));
 C_H_GPR(cellfun('isempty', GPRmat)) = nan;
