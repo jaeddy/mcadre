@@ -1,4 +1,4 @@
-function [GM,C,NC,P,Z,inactiveRxns,model_C] = rankReactions(model, G, U, confidenceScores, C_H_genes)
+function [GM,C,NC,P,Z,inactiveRxns,model_C] = rank_reactions(model, G, U, confidenceScores, C_H_genes)
 
 % Inputs:
 % - model
@@ -45,7 +45,8 @@ model_C = C;
 %% Find inactive/blocked reactions
 % I'm not 100% convinced that we should do this before calculating the
 % connectivity-based evidence, but I'll look into this more later.
-inactiveRxns = checkModelConsistency(model, [], {}, 1);
+method = 1; % fastFVA
+inactiveRxns = check_model_consistency(model, method);
 
 inactive_C = intersect(inactiveRxns, C);
 C = setdiff(C, inactiveRxns);

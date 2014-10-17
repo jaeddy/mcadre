@@ -265,7 +265,7 @@ end
 display('---');
 
 % Check outputs; should find 1273 inactive reactions in Recon 1
-display('## Checking output of check_model_consistency with fastFVA...');
+display('## Checking output of check_model_consistency with fastcc...');
 
 if exist('inactiveRxns', 'var')
     if numel(inactiveRxns) == 1273

@@ -39,7 +39,6 @@ if nargin < 3
 end
 
 if numel(r)
-    r
    % Remove reaction r from the model
     model = removeRxns(model, r);
 end
@@ -81,7 +80,6 @@ if numel(deadEnd_C)
 % If the option is specified, fastFVA is used to quickly scan through all
 % reactions. **note: may want to include option to use fastFVA with GLPK
 else
-    length(model.rxns)
     inactiveRxns = union(inactiveRxns, find_inactive_rxns(model, method));
 end
 
