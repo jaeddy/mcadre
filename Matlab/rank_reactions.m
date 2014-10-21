@@ -25,7 +25,7 @@ end
 
 
 %% Map gene ubiqiuty scores to reactions
-U_GPR = map_gene_scores_to_rxns(model, G, U, GPRrxns, GPRmat);
+U_GPR = map_gene_scores_to_rxns(model, G, U, GPRmat);
 
 
 %% Determine confidence level-based evidence
