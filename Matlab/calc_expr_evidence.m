@@ -10,4 +10,4 @@ for i = 1:numel(model.rxns)
 end
 % For reactions with no corresponding probe in expression data
 E_X(isnan(E_X)) = 0;
-% E_X(is_C_H) = 1;
+E_X(is_C_H) = 1;

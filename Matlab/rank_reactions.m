@@ -51,7 +51,7 @@ inactiveRxns = check_model_consistency(model, method);
 inactive_C = intersect(inactiveRxns, C);
 C = setdiff(C, inactiveRxns);
 
-GM = removeRxns(model,inactiveRxns);
+GM = removeRxns(model, inactiveRxns);
 R_G = GM.rxns; [NC, NC_idx] = setdiff(R_G, C);
 
 % Update list of expression-based evidence
