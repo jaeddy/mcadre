@@ -1,4 +1,4 @@
-function [GM, E_X, E_L] = initialize_generic_model(model, inactiveRxns, confidenceScores)
+function [GM, C, E_X, E_L] = initialize_generic_model(model, C, E_X, confidenceScores)
 
 % This function creates a consistent generic model by removing all inactive
 % reactions. It will also return adjusted vectors for expression-based and
@@ -15,13 +15,19 @@ else
     E_L = zeros(size(model.rxns));
 end
 
+method = 1; % fastFVA
+inactiveRxns = check_model_consistency(model, method);
+
+% Update core
+C = setdiff(C, inactiveRxns);
+
+% Create generic model
 GM = removeRxns(model, inactiveRxns);
-R_G = GM.rxns; 
-[~, NC_idx] = setdiff(R_G, C);
 
 % Update list of expression-based evidence
 [~, GM_idx, model_idx] = intersect(GM.rxns, model.rxns);
-E_X_GM = zeros(size(GM.rxns)); E_X_GM(GM_idx) = E_X(model_idx);
+E_X_GM = zeros(size(GM.rxns)); 
+E_X_GM(GM_idx) = E_X(model_idx);
 E_X = E_X_GM;
 
 % Update list of confidence level-based evidence

@@ -266,29 +266,34 @@ end
 display('---');
 
 
-%% Test inactive reaction removal step
+%% Test initialize_generic_model
 
-% Test with results from map_gene_scores_to_rxns with high-confidence core
-display('## Testing inactive reaction removal step...');
+% Test with results from initialize_generic_model with high-confidence core
+display('## Testing initialize_generic_model...');
 
-if exist('U_GPR', 'var')
+if exist('E_X', 'var')
     try
-        E_X = calc_expr_evidence(model, GPRrxns, U_GPR, is_C_H);
+        [GM, C, E_X_GM, E_L] = initialize_generic_model(model, C, E_X, ...
+            confidenceScores);
+
         display(['PASS...', ...
-            'Function calc_expr_evidence ran without error']);
+            'Function initialize_generic_model ran without error']);
     catch err
         display(['FAIL...', ...
-            'Function calc_expr_evidence was terminated with the error:']);
+            'Function initialize_generic_model was terminated with the error:']);
         display(['> ', err.message]);
     end
 else
     display(['FAIL...', ...
-        'GPRmat missing, cannot check calc_expr_evidence']);
+        'E_X missing, cannot check initialize_generic_model']);
 end
 display('---');
 
+
+
+%%
 % Check outputs for small U_GPR
-display('## Checking output of calc_expr_evidence, high-confidence core...');
+display('## Checking output of initialize_generic_model, high-confidence core...');
 
 if exist('E_X', 'var')
     

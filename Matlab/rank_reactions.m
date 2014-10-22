@@ -42,27 +42,14 @@ C = model.rxns(E_X > 0.9);
 model_C = C;
 
 
-%% Find inactive/blocked reactions
+%% Initialize the consistent generic model & update evidence vectors
 % I'm not 100% convinced that we should do this before calculating the
 % connectivity-based evidence, but I'll look into this more later.
-method = 1; % fastFVA
-inactiveRxns = check_model_consistency(model, method);
 
-inactive_C = intersect(inactiveRxns, C);
-C = setdiff(C, inactiveRxns);
+[GM, C, E_X, E_L] = initialize_generic_model(model, C, E_X, confidenceScores);
 
-GM = removeRxns(model, inactiveRxns);
-R_G = GM.rxns; [NC, NC_idx] = setdiff(R_G, C);
-
-% Update list of expression-based evidence
-[rxnsInt, GM_idx, model_idx] = intersect(GM.rxns, model.rxns);
-E_X_GM = zeros(size(GM.rxns)); E_X_GM(GM_idx) = E_X(model_idx);
-E_X = E_X_GM;
-
-% Update list of confidence level-based evidence
-E_L_GM = zeros(size(GM.rxns));
-E_L_GM(GM_idx) = E_L(model_idx);
-E_L = E_L_GM;
+R_G = GM.rxns; 
+[NC, NC_idx] = setdiff(R_G, C);
 
 
 %% Calculate connectivity-based evidence
