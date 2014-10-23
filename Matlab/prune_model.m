@@ -43,9 +43,9 @@ while numel(P) %&& count < 3 % was just for testing, removed BH
                 'media', mediaDef);
 
             if numel(inactive_C) / numel(inactive_NC) <= eta && tmpStatus
-                R_P = setdiff(R_P,inactive_G);
-                PM = removeRxns(PM,inactive_G);
-                P(ismember(P,inactive_G)) = [];
+                R_P = setdiff(R_P, inactive_G);
+                PM = removeRxns(PM, inactive_G);
+                P(ismember(P, inactive_G)) = [];
                 NC_removed = NC_removed + numel(inactive_NC);
                 C_removed = C_removed + numel(inactive_C);
                 num_removed = NC_removed + C_removed;
@@ -89,7 +89,7 @@ while numel(P) %&& count < 3 % was just for testing, removed BH
                 num_removed = NC_removed + C_removed;
                 display('Removed non-core inactive reactions')
 
-                % result = -2.x indicates that reaction r had expression
+                % result = -2.x indicates that reaction r had expression.
                 % evidence and was removed along with (only) non-core
                 % inactivated reactions; x = 1 or 2 depending on whether
                 % removal of r created dead-end metabolites
