@@ -1,4 +1,4 @@
-function [GM,C,NC,P,Z,inactiveRxns,model_C] = rank_reactions(model, G, U, confidenceScores, C_H_genes)
+function [GM, C, NC, P, Z, model_C] = rank_reactions(model, G, U, confidenceScores, C_H_genes)
 
 % Inputs:
 % - model
@@ -53,14 +53,16 @@ R_G = GM.rxns;
 
 
 %% Calculate connectivity-based evidence
-E_C = calc_conn_evidence(GM);
+E_C = calc_conn_evidence(GM, E_X);
 
 
 %% Rank non-core reactions
-E_X_NC = E_X(NC_idx); E_C_NC = E_C(NC_idx); E_L_NC = E_L(NC_idx);
-[E_NC,NC_order] = sortrows([E_X_NC, E_C_NC, E_L_NC], [1, 2, 3]);
-P = NC(NC_order);
+E_X_NC = E_X(NC_idx); % expression-based evidence for non-core reactions
+E_C_NC = E_C(NC_idx); % connectivity-based evidence for non-core reactions
+E_L_NC = E_L(NC_idx); % literature-based evidence for non-core reactions
+[E_NC, NC_order] = sortrows([E_X_NC, E_C_NC, E_L_NC], [1, 2, 3]);
+P = NC(NC_order); % ordered (ranked) non-core reactions
 
 
 %% Identify zero-expression reactions
-Z = P(E_NC(:,1) == -1e-6);
+Z = P(E_NC(:, 1) == -1e-6);

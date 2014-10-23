@@ -268,10 +268,15 @@ display('---');
 
 %% Test initialize_generic_model
 
-% Test with results from initialize_generic_model with high-confidence core
+% Test with results from calc_expr_evidence
 display('## Testing initialize_generic_model...');
 
 if exist('E_X', 'var')
+    
+    % define core
+    C = model.rxns(E_X > 0.9);
+    model_C = C;
+
     try
         [GM, C, E_X_GM, E_L] = initialize_generic_model(model, C, E_X, ...
             confidenceScores);
@@ -280,7 +285,7 @@ if exist('E_X', 'var')
             'Function initialize_generic_model ran without error']);
     catch err
         display(['FAIL...', ...
-            'Function initialize_generic_model was terminated with the error:']);
+            'Function initialize_generic_model was terminated with error:']);
         display(['> ', err.message]);
     end
 else
@@ -290,28 +295,12 @@ end
 display('---');
 
 
+% Check that GM is correct size, should be 2469 reactions
+display('## Checking generic model output of initialize_generic_model...');
 
-%%
-% Check outputs for small U_GPR
-display('## Checking output of initialize_generic_model, high-confidence core...');
-
-if exist('E_X', 'var')
+if exist('GM', 'var')
     
-    E_X_GPR = E_X(gprTest);
-    is_Z = E_X_GPR == -1e-6;
-    E_X_GPR = round(E_X_GPR * 1e4) / 1e4;
-    E_X_GPR(is_Z) = -1e-6;
-
-    testE_X = [0; ...
-        0.1848; ...
-        0.6445; ...
-        0.7062; ...
-        -1e-6; ...
-        1.0000; ...
-        1.0000; ...
-        1.0000];
-    
-    if sum(sum(E_X_GPR ~= testE_X)) == 0
+    if numel(GM.rxns) == 2469
         display(['PASS...', ...
             'Function calc_expr_evidence returns the expected result']);
     else
@@ -324,3 +313,122 @@ else
 end
 display('---');
 
+% Check that E_X is correct size, should be 2469 reactions
+display('## Checking evidence output of initialize_generic_model...');
+
+if exist('GM', 'var')
+    
+    [~, GM_idx, GPR_idx] = intersect(GM.rxns, gprTestRxns);
+    GM_GPR = GM.rxns(GM_idx);
+    E_X_GM_GPR = E_X_GM(GM_idx);
+    
+    is_Z = E_X_GM_GPR == -1e-6;
+    E_X_GM_GPR = round(E_X_GM_GPR * 1e4) / 1e4;
+    E_X_GM_GPR(is_Z) = -1e-6;
+
+    testE_X_GM = [0; ...
+        0.1848; ...
+        0.6445; ...
+        0.7062; ...
+        -1e-6; ...
+        1.0000; ...
+        1.0000];
+    
+    if sum(sum(E_X_GM_GPR ~= testE_X_GM)) == 0
+        display(['PASS...', ...
+            'Function calc_expr_evidence returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function calc_expr_evidence returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'No output to check from function calc_expr_evidence']);
+end
+display('---');
+
+
+%% Test calc_conn_evidence
+
+% Test with results from initialize_generic_model
+display('## Testing calc_conn_evidence...');
+
+if exist('GM', 'var')
+    
+    % Construct small test S matrix
+    S = zeros(10, 8);
+    S(1, [1, 2, 4]) = [1, -1, -1];
+    S(2, [1, 3]) = [1, -1];
+    S(3, [1, 6]) = [-1, 1];
+    S(4, 1) = -1;
+    S(5, [3, 8]) = [1, -1];
+    S(6, [4, 5]) = [1, -1];
+    S(7, [5, 7]) = [1, -1];
+    S(8, 6) = -1;
+    S(9, 7) = 1;
+    S(10, 8) = 1;
+    test.S = S;
+    
+    % Test expression evidence
+    E_X_test = [1; 0.8; 0.9; 0.9; 0.4; 0.3; 1e-6; 0.7];
+    
+    try
+        E_C = calc_conn_evidence(test, E_X_test);
+
+        display(['PASS...', ...
+            'Function calc_conn_evidence ran without error']);
+    catch err
+        display(['FAIL...', ...
+            'Function calc_conn_evidence was terminated with error:']);
+        display(['> ', err.message]);
+    end
+else
+    display(['FAIL...', ...
+        'GM missing, cannot check calc_conn_evidence']);
+end
+display('---');
+
+% Check whether connectivity evidence matches expected output
+display('## Checking output of calc_conn_evidence...');
+
+if exist('E_C', 'var')
+    
+    % round values in E_C for comparison
+    is_Z = E_C == -1e-6;
+    E_C_tmp = round(E_C * 1e4) / 1e4;
+    E_C_tmp(is_Z) = -1e-6;
+    
+    % Expected output
+    testE_C = [1.4500; 0.5500; 0.9500; 0.8500; 0.3000; 0.2500; 0.2000; 0.4500];
+    
+    if sum(sum(E_C_tmp ~= testE_C)) == 0
+        display(['PASS...', ...
+            'Function calc_expr_evidence returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function calc_expr_evidence returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'No output to check from function calc_expr_evidence']);
+end
+display('---');
+
+
+%% Test rank_reactions
+
+% Test with Recon 1 and U87 inputs
+display('## Testing rank_reactions...');
+
+try
+    [GM, C, NC, P, Z, model_C] = rank_reactions(model, G, U, ...
+        confidenceScores, C_H_genes);
+
+    display(['PASS...', ...
+        'Function rank_reactions ran without error']);
+catch err
+    display(['FAIL...', ...
+        'Function rank_reactions was terminated with error:']);
+    display(['> ', err.message]);
+end
+display('---');
