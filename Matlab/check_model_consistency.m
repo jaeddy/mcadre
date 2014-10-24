@@ -28,15 +28,19 @@ function [inactiveRxns, time, result] = check_model_consistency(model, method, r
 %       2: removal of r created metabolite dead ends leading to
 %          inactivation of core reactions
 
-if nargin < 2
-    method = 1;
+if nargin < 4
+    deCheck = 0;
+    C = {};
 end
 
 if nargin < 3
     r = [];
-    deCheck = 0;
-    C = {};
 end
+
+if nargin < 2
+    method = 1;
+end
+
 
 if numel(r)
    % Remove reaction r from the model

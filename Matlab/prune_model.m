@@ -1,32 +1,28 @@
+function [PM, cRes] = prune_model(GM, P, C, eta, precursorMets, method)
+
+% Initialize variables
+R_G = GM.rxns;
+PM = GM;
+R_P = R_G;
+
 NC_removed = 0; C_removed = 0;
-cTime = zeros(3000, 1); cRes = zeros(3000, 1);
+cRes = zeros(3000, 1);
 count = 1;
 
-while numel(P) %&& count < 3 % was just for testing, removed BH
+while numel(P) %&& count < 3 % for testing
     display(['Reaction no. ', num2str(count)])
     r = P(1);
     modelR = removeRxns(PM, r);
 
     % First check precursor production; if this test fails, no need to
     % check model consistency with FVA (time-saving step)
-    [rStatus, time] = check_model_function(modelR, ...
-        'biomass', biomassRxn,...
-        'media', mediaDef);
+    rStatus = check_model_function(modelR, ...
+        'requiredMets', precursorMets);
+    
     if rStatus
 
         % Check for inactive reactions after removal of r
-        [inactive_G, time, result] = check_model_consistency(PM, r, C, 1);
-        cTime(count) = time; cRes(count) = result;
-        if ~numel(inactive_G)
-            save mCADRE_error
-            break;
-        end
-
-        % However, don't remove biomass or exchange reactions, even if
-        % they're inactive
-        inactive_G = setdiff(inactive_G, {'biomass'});
-
-        inactive_G = setdiff(inactive_G, PM.rxns(findExcRxns(PM)));
+        inactive_G = check_model_consistency(PM, method, r);
 
         inactive_C = intersect(inactive_G, C);
         inactive_NC = setdiff(inactive_G, inactive_C);
@@ -39,10 +35,9 @@ while numel(P) %&& count < 3 % was just for testing, removed BH
             % Check model function with all inactive reactions removed
             modelTmp = removeRxns(PM, inactive_G);
             tmpStatus = check_model_function(modelTmp, ...
-                'biomass', biomassRxn,...
-                'media', mediaDef);
+                'requiredMets', precursorMets);
 
-            if numel(inactive_C) / numel(inactive_NC) <= eta && tmpStatus
+            if (numel(inactive_C) / numel(inactive_NC) <= eta) && tmpStatus
                 R_P = setdiff(R_P, inactive_G);
                 PM = removeRxns(PM, inactive_G);
                 P(ismember(P, inactive_G)) = [];
@@ -51,11 +46,10 @@ while numel(P) %&& count < 3 % was just for testing, removed BH
                 num_removed = NC_removed + C_removed;
                 display('Removed all inactive reactions')
 
-                % result = -1.x indicates that reaction r had zero
+                % result = -1 indicates that reaction r had zero
                 % expression evidence and was removed along with any
-                % consequently inactivated reactions; x = 1 or 2 depending
-                % on whether removal of r created dead-end metabolites
-                result = -1 - result / 10;
+                % consequently inactivated reactions
+                result = -1;
             else
                 % Note: no reactions (core or otherwise) are actually
                 % removed in this step, but it is necessary to update the
@@ -63,13 +57,13 @@ while numel(P) %&& count < 3 % was just for testing, removed BH
                 num_removed = NC_removed + C_removed;
                 P(1) = [];
 
-                % result = 1.x.y indicates that no reactions were removed
+                % result = 1.x indicates that no reactions were removed
                 % because removal of r either led to a ratio of inactivated
                 % core vs. non-core reactions above the specified threshold
-                % eta (y = 1) or the removal of r and consequently
+                % eta (x = 1) or the removal of r and consequently
                 % inactivated reactions prevented production of required
-                % metabolites (y = 0)
-                result = 1 + result / 10 + tmpStatus / 100;
+                % metabolites (x = 0)
+                result = 1 + tmpStatus / 10;
             end
 
         % If reaction has expression evidence, only attempt to remove
@@ -78,8 +72,7 @@ while numel(P) %&& count < 3 % was just for testing, removed BH
             % Check model function with non-core inactive reactions removed
             modelTmp = removeRxns(PM, inactive_NC);
             tmpStatus = check_model_function(modelTmp, ...
-                'biomass', biomassRxn,...
-                'media', mediaDef);
+                'requiredMets', precursorMets);
 
             if numel(inactive_C) == 0 && tmpStatus
                 R_P = setdiff(R_P, inactive_NC);
@@ -89,21 +82,20 @@ while numel(P) %&& count < 3 % was just for testing, removed BH
                 num_removed = NC_removed + C_removed;
                 display('Removed non-core inactive reactions')
 
-                % result = -2.x indicates that reaction r had expression.
+                % result = -2 indicates that reaction r had expression.
                 % evidence and was removed along with (only) non-core
-                % inactivated reactions; x = 1 or 2 depending on whether
-                % removal of r created dead-end metabolites
-                result = -2 - result / 10;
+                % inactivated reactions
+                result = -2;
             else
                 num_removed = NC_removed + C_removed;
                 P(1) = [];
 
-                % result = 2.x.y indicates that no reactions were removed
+                % result = 2.x indicates that no reactions were removed
                 % because removal of r either led to inactivated core
-                % reactions (y = 1) or the removal of r and consequently
+                % reactions (x = 1) or the removal of r and consequently
                 % inactivated reactions prevented production of required
-                % metabolites (y = 0)
-                result = 2 + result / 10 + tmpStatus / 100;
+                % metabolites (x = 0)
+                result = 2 + tmpStatus / 10;
             end
         end
     else
@@ -115,11 +107,12 @@ while numel(P) %&& count < 3 % was just for testing, removed BH
         % metabolites
         result = 3;
     end
-    cTime(count) = time; cRes(count) = result;
+    
+    cRes(count) = result;
     count = count + 1;
     display(sprintf(['Num. removed: ', num2str(num_removed), ...
         ' (', num2str(C_removed), ' core, ', ...
         num2str(NC_removed), ' non-core); ', ...
         'Num. remaining: ', num2str(numel(P)), '\n']))
 end
-cTime(count:end) = []; cRes(count:end) = [];
+cRes(count:end) = [];
