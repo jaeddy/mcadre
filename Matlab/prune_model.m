@@ -1,4 +1,4 @@
-function [PM, cRes] = prune_model(GM, P, C, eta, precursorMets, method)
+function [PM, cRes] = prune_model(GM, P, C, Z, eta, precursorMets, method, cutoff)
 
 % Initialize variables
 R_G = GM.rxns;
@@ -9,9 +9,14 @@ NC_removed = 0; C_removed = 0;
 cRes = zeros(3000, 1);
 count = 1;
 
-while numel(P) %&& count < 3 % for testing
+if nargin < 8
+    cutoff = Inf;
+end
+
+while numel(P) && count < cutoff % for testing
     display(['Reaction no. ', num2str(count)])
     r = P(1);
+    display(['Attempting to remove reaction ', r{:}, '...'])
     modelR = removeRxns(PM, r);
 
     % First check precursor production; if this test fails, no need to
@@ -28,10 +33,11 @@ while numel(P) %&& count < 3 % for testing
         inactive_NC = setdiff(inactive_G, inactive_C);
 
         % Remove reactions with zero expression (previously penalized in
-        % rankReactions) and corresponding inactive core reactions, only if
+        % rank_reactions) and corresponding inactive core reactions, only if
         % sufficiently more non-core reactions are removed
         if ismember(r, Z)
-
+            display('Zero-expression evidence for reaction...')
+            
             % Check model function with all inactive reactions removed
             modelTmp = removeRxns(PM, inactive_G);
             tmpStatus = check_model_function(modelTmp, ...
@@ -46,16 +52,22 @@ while numel(P) %&& count < 3 % for testing
                 num_removed = NC_removed + C_removed;
                 display('Removed all inactive reactions')
 
-                % result = -1 indicates that reaction r had zero
+                % result = -1.x indicates that reaction r had zero
                 % expression evidence and was removed along with any
-                % consequently inactivated reactions
-                result = -1;
+                % consequently inactivated reactions; x indicates the number of
+                % core reactions removed
+                if numel(inactive_C) > 100
+                    removed_C_indicator = numel(inactive_C) / 100;
+                else removed_C_indicator = numel(inactive_C) / 10;
+                end
+                result = -1 - removed_C_indicator;
             else
                 % Note: no reactions (core or otherwise) are actually
                 % removed in this step, but it is necessary to update the
                 % total number of removed reactions to avoid errors below
                 num_removed = NC_removed + C_removed;
                 P(1) = [];
+                display('No reactions removed')
 
                 % result = 1.x indicates that no reactions were removed
                 % because removal of r either led to a ratio of inactivated
@@ -84,11 +96,17 @@ while numel(P) %&& count < 3 % for testing
 
                 % result = -2 indicates that reaction r had expression.
                 % evidence and was removed along with (only) non-core
-                % inactivated reactions
-                result = -2;
+                % inactivated reactions; x indicates the number of
+                % core reactions removed (should be zero!)
+                if numel(inactive_C) > 100
+                    removed_C_indicator = numel(inactive_C) / 100;
+                else removed_C_indicator = numel(inactive_C) / 10;
+                end
+                result = -2 - removed_C_indicator;
             else
                 num_removed = NC_removed + C_removed;
                 P(1) = [];
+                display('No reactions removed')
 
                 % result = 2.x indicates that no reactions were removed
                 % because removal of r either led to inactivated core
