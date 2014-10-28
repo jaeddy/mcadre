@@ -13,6 +13,10 @@ if nargin < 8
     cutoff = Inf;
 end
 
+if nargin < 7
+    method = 1; % fastFVA
+end
+
 while numel(P) && count < cutoff % for testing
     display(['Reaction no. ', num2str(count)])
     r = P(1);

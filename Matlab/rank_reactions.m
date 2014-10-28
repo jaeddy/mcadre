@@ -1,4 +1,5 @@
-function [GM, C, NC, P, Z, model_C] = rank_reactions(model, G, U, confidenceScores, C_H_genes)
+function [GM, C, NC, P, Z, model_C] = ...
+    rank_reactions(model, G, U, confidenceScores, C_H_genes, method)
 
 % Inputs:
 % - model
@@ -12,6 +13,9 @@ function [GM, C, NC, P, Z, model_C] = rank_reactions(model, G, U, confidenceScor
 % - NC: non-core reactions
 % - P: removal order of non-core reactions
 
+if nargin < 6
+    method = 1; % fastFVA
+end
 
 %% Parse GPRs
 [GPRrxns, GPRmat] = parse_gprs(model);
@@ -46,7 +50,8 @@ model_C = C;
 % I'm not 100% convinced that we should do this before calculating the
 % connectivity-based evidence, but I'll look into this more later.
 
-[GM, C, E_X, E_L] = initialize_generic_model(model, C, E_X, confidenceScores);
+[GM, C, E_X, E_L] = initialize_generic_model(model, C, ...
+    E_X, confidenceScores, method);
 
 R_G = GM.rxns; 
 [NC, NC_idx] = setdiff(R_G, C);

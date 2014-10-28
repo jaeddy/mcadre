@@ -1,4 +1,5 @@
-function [GM, C, E_X, E_L] = initialize_generic_model(model, C, E_X, confidenceScores)
+function [GM, C, E_X, E_L] = ...
+    initialize_generic_model(model, C, E_X, confidenceScores, method)
 
 % This function creates a consistent generic model by removing all inactive
 % reactions. It will also return adjusted vectors for expression-based and
@@ -15,7 +16,10 @@ else
     E_L = zeros(size(model.rxns));
 end
 
-method = 1; % fastFVA
+if nargin < 5
+    method = 1; % fastFVA
+end
+
 inactiveRxns = check_model_consistency(model, method);
 
 % Update core

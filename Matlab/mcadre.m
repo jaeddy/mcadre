@@ -1,5 +1,5 @@
 function [GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
-    mcadre(model, G, U, confidenceScores, C_H_genes)
+    mcadre(model, G, U, confidenceScores, C_H_genes, method)
 
 % Inputs
 % - model: original generic model
@@ -33,6 +33,10 @@ function [GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
 %       3: removal of reaction r by itself prevented production of required
 %          metabolites (therefore was not removed)
 
+if nargin < 6
+    method = 1; % fastFVA
+end
+
 %% Generate order for reaction removal
 
 % Gene ubiquity scores are converted to reaction expression evidence to
@@ -46,7 +50,7 @@ function [GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
 display('Processing inputs and ranking reactions...')
 
 [GM, C, NC, P, Z,model_C] = ...
-    rank_reactions(model, G, U, confidenceScores, C_H_genes);
+    rank_reactions(model, G, U, confidenceScores, C_H_genes, method);
 
 %% Define inputs to the model pruning step
 
