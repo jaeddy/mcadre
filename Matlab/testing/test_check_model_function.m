@@ -268,11 +268,11 @@ display('---');
 
 %% Test check_model_function with mouse
 
-load('MouseModel_New');
+load('mouseModel');
+load('MouseModel_1');
+model = format_mouse_model(MouseModel_1);
 load('precursorMets');
 changeCobraSolver('glpk');
-
-model = MouseModel_New;
 
 % Test with default inputs
 display('## Testing check_model_function with default inputs...')
@@ -300,7 +300,7 @@ display('---');
 % Test with reactions removed that will prevent function
 display('## Testing check_model_function with glucose reactions removed...')
 
-glcRxns = findRxnsFromMets(model, 'glc-DASH-D[e]');
+glcRxns = findRxnsFromMets(model, 'glc_D[e]');
 glcRxns = setdiff(glcRxns, 'EX_glc(e)');
 modelR = removeRxns(model, glcRxns);
 
