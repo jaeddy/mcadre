@@ -49,7 +49,7 @@ end
 
 display('Processing inputs and ranking reactions...')
 
-[GM, C, NC, P, Z,model_C] = ...
+[GM, C, NC, P, Z, model_C] = ...
     rank_reactions(model, G, U, confidenceScores, C_H_genes, method);
 
 %% Define inputs to the model pruning step
@@ -70,7 +70,8 @@ display('Generic model passed precursor metabolites test');
     display('Pruning reactions...')
     t0 = clock;
     
-    [PM, cRes] = prune_model(GM, P, C, Z, eta, precursorMets, method);
+    [PM, cRes] = prune_model(GM, P, C, Z, eta, precursorMets, salvageCheck, ...
+        method);
     
     pruneTime = etime(clock,t0);
 else

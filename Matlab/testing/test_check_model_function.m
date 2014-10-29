@@ -1,5 +1,5 @@
 
-load('HR1_CbModel');
+load('humanModel');
 load('precursorMets');
 changeCobraSolver('glpk');
 
@@ -61,19 +61,13 @@ display('## Testing output of set_organic_met_bounds...');
 
 if all(check)
     is_organic_ex = ismember(testModel.rxns, organicExRxns);
-    is_uptake_rxn = ismember(testModel.rxns, {'EX_glc(e)', 'EX_co2(e)'});
-    if all(testModel.lb(is_organic_ex & ~is_uptake_rxn) == 0) && ...
-            all(testModel.lb(is_uptake_rxn) ~= 0)
+    if all(testModel.lb(is_organic_ex) == 0)
         display(['PASS...', ...
             'Exchange reaction bounds were set correctly']);
-    elseif any(testModel.lb(is_organic_ex & ~is_uptake_rxn) ~= 0)
+    else
         display(['FAIL...', ...
             'At least one organic exchange reaction lower-bound was ', ...
             'not correctly set to 0.']);
-    else
-        display(['FAIL...', ...
-            'At least one required uptake reaction lower-bound was ', ...
-            'incorrectly set to zero.']);
     end
 else
     display(['FAIL...', ...
@@ -108,6 +102,10 @@ try
     exRxns = find_ex_rxns(model);
     testModel = set_organic_met_bounds(model, exRxns);
     [testModel, requiredRxns] = specify_required_rxns(testModel, metList);
+    
+    % Allow uptake of glucose and CO2
+    testModel = changeRxnBounds(testModel, 'EX_glc(e)', -5, 'l');
+    testModel = changeRxnBounds(testModel, 'EX_co2(e)', -1000, 'l');
 catch err
     display(['FAIL...', ...
         'Cannot test check_rxn_flux because one of the preceding functions', ...
@@ -266,59 +264,59 @@ end
 display('---');
 
 
-%% Test check_model_function with mouse
-
-load('mouseModel');
-load('MouseModel_1');
-model = format_mouse_model(MouseModel_1);
-load('precursorMets');
-changeCobraSolver('glpk');
-
-% Test with default inputs
-display('## Testing check_model_function with default inputs...')
-try
-    genericStatus = check_model_function(model, ...
-        'requiredMets', precursorMets);
-    display(['PASS...', ...
-        'Function check_model_function ran without error']);
-    
-    if genericStatus
-        display(['PASS...', ...
-            'Check for functionality returns expected result']);
-    else
-        display(['FAIL...', ...
-            'Check for functionality returns unexpected result']);
-    end
-catch err
-    display(['FAIL...', ...
-        'Function check_model_function was terminated with the error:']);
-    display(['> ', err.message]);
-end
-display('---');
-
-%%
-% Test with reactions removed that will prevent function
-display('## Testing check_model_function with glucose reactions removed...')
-
-glcRxns = findRxnsFromMets(model, 'glc_D[e]');
-glcRxns = setdiff(glcRxns, 'EX_glc(e)');
-modelR = removeRxns(model, glcRxns);
-
-try
-    genericStatus = check_model_function(modelR, ...
-        'requiredMets', precursorMets);
-    display(['PASS...', ...
-        'Function check_model_function ran without error']);
-    
-    if ~genericStatus
-        display(['PASS...', ...
-            'Check for functionality returns expected result']);
-    else
-        display(['FAIL...', ...
-            'Check for functionality returns unexpected result']);
-    end
-catch err
-    display(['FAIL...', ...
-        'Function check_model_function was terminated with the error:']);
-    display(['> ', err.message]);
-end
+% %% Test check_model_function with mouse
+% 
+% load('mouseModel');
+% load('MouseModel_1');
+% model = format_mouse_model(MouseModel_1);
+% load('precursorMets');
+% changeCobraSolver('glpk');
+% 
+% % Test with default inputs
+% display('## Testing check_model_function with default inputs...')
+% try
+%     genericStatus = check_model_function(model, ...
+%         'requiredMets', precursorMets);
+%     display(['PASS...', ...
+%         'Function check_model_function ran without error']);
+%     
+%     if genericStatus
+%         display(['PASS...', ...
+%             'Check for functionality returns expected result']);
+%     else
+%         display(['FAIL...', ...
+%             'Check for functionality returns unexpected result']);
+%     end
+% catch err
+%     display(['FAIL...', ...
+%         'Function check_model_function was terminated with the error:']);
+%     display(['> ', err.message]);
+% end
+% display('---');
+% 
+% %%
+% % Test with reactions removed that will prevent function
+% display('## Testing check_model_function with glucose reactions removed...')
+% 
+% glcRxns = findRxnsFromMets(model, 'glc_D[e]');
+% glcRxns = setdiff(glcRxns, 'EX_glc(e)');
+% modelR = removeRxns(model, glcRxns);
+% 
+% try
+%     genericStatus = check_model_function(modelR, ...
+%         'requiredMets', precursorMets);
+%     display(['PASS...', ...
+%         'Function check_model_function ran without error']);
+%     
+%     if ~genericStatus
+%         display(['PASS...', ...
+%             'Check for functionality returns expected result']);
+%     else
+%         display(['FAIL...', ...
+%             'Check for functionality returns unexpected result']);
+%     end
+% catch err
+%     display(['FAIL...', ...
+%         'Function check_model_function was terminated with the error:']);
+%     display(['> ', err.message]);
+% end

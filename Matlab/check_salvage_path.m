@@ -1,5 +1,10 @@
 function [salvageStatus, time] = check_salvage_path(model)
 
+% When the model is allowed to use PRPP and guanine or hypoxanthine, test if it
+% can make GMP or IMP. This is the salvage pathway that non-hepatic tissues use
+% for purine synthesis. Not useful when the tissue is known to make purines de
+% novo.
+
 %%
 t0 = clock;
 

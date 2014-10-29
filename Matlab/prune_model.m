@@ -1,4 +1,5 @@
-function [PM, cRes] = prune_model(GM, P, C, Z, eta, precursorMets, method, cutoff)
+function [PM, cRes] = ...
+    prune_model(GM, P, C, Z, eta, precursorMets, salvageCheck, method, cutoff)
 
 % Initialize variables
 R_G = GM.rxns;
@@ -9,12 +10,17 @@ NC_removed = 0; C_removed = 0;
 cRes = zeros(3000, 1);
 count = 1;
 
-if nargin < 8
+if nargin < 9
     cutoff = Inf;
 end
 
-if nargin < 7
+if nargin < 8
     method = 1; % fastFVA
+end
+
+if nargin < 7
+    salvageCheck = 1; % assume non-hepatic tissue, where nucleotides are not
+                      % expected to be produced de novo
 end
 
 while numel(P) && count < cutoff % for testing
@@ -27,6 +33,12 @@ while numel(P) && count < cutoff % for testing
     % check model consistency with FVA (time-saving step)
     rStatus = check_model_function(modelR, ...
         'requiredMets', precursorMets);
+    
+    % If specified, check the salvage pathway as well
+    if salvageCheck
+        rSalvage = check_salvage_path(modelR);
+        rStatus = rStatus && rSalvage;
+    end
     
     if rStatus
 
@@ -46,6 +58,12 @@ while numel(P) && count < cutoff % for testing
             modelTmp = removeRxns(PM, inactive_G);
             tmpStatus = check_model_function(modelTmp, ...
                 'requiredMets', precursorMets);
+            
+            % If specified, check the salvage pathway as well
+            if salvageCheck
+                tmpSalvage = check_salvage_path(modelTmp);
+                tmpStatus = tmpStatus && tmpSalvage;
+            end
 
             if (numel(inactive_C) / numel(inactive_NC) <= eta) && tmpStatus
                 R_P = setdiff(R_P, inactive_G);
@@ -89,6 +107,12 @@ while numel(P) && count < cutoff % for testing
             modelTmp = removeRxns(PM, inactive_NC);
             tmpStatus = check_model_function(modelTmp, ...
                 'requiredMets', precursorMets);
+            
+            % If specified, check the salvage pathway as well
+            if salvageCheck
+                tmpSalvage = check_salvage_path(modelTmp);
+                tmpStatus = tmpStatus && tmpSalvage;
+            end
 
             if numel(inactive_C) == 0 && tmpStatus
                 R_P = setdiff(R_P, inactive_NC);
