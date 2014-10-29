@@ -40,19 +40,19 @@ t0 = clock;
 % Identify exchange reactions in the model
 exRxns = find_ex_rxns(model);
 
-if exist('mediaDef')
+if exist('mediaDef', 'var')
     model = set_media_ex_bounds(model); % not implemented in this version
 else
     model = set_organic_met_bounds(model, exRxns);
 end
 
 % Add demand reactions for required metabolites
-if exist('metList')
+if exist('metList', 'var')
     [model, requiredRxns] = specify_required_rxns(model, metList);
 else requiredRxns = {};
 end
 
-if exist('biomassRxn')
+if exist('biomassRxn', 'var')
     requiredRxns = [requiredRxns, biomassRxn]; % not implemented in this version
 end
 

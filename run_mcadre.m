@@ -17,4 +17,4 @@ method = 1; % fastFVA
 %% Run mcadre
 
 [GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
-    mcadre(model, G, U, confidenceScores, C_H_genes, method)
+    mcadre(model, G, U, confidenceScores, C_H_genes, method);
