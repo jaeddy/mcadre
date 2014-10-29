@@ -40,11 +40,16 @@ t0 = clock;
 % Identify exchange reactions in the model
 exRxns = find_ex_rxns(model);
 
+% Turn off uptake of organic metabolites
 if exist('mediaDef', 'var')
     model = set_media_ex_bounds(model); % not implemented in this version
 else
     model = set_organic_met_bounds(model, exRxns);
 end
+
+% Allow uptake of glucose and CO2
+model = changeRxnBounds(model, 'EX_glc(e)', -5, 'l');
+model = changeRxnBounds(model, 'EX_co2(e)', -1000, 'l');
 
 % Add demand reactions for required metabolites
 if exist('metList', 'var')
