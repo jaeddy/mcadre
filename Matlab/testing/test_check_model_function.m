@@ -264,36 +264,62 @@ end
 display('---');
 
 
-% %% Test check_model_function with mouse
-% 
+%% Test check_salvage_path
+
+% Note: not directly part of check_model_function, but closely related
+
+% Test with default inputs
+display('## Testing check_salvage_path with default inputs...')
+try
+    salvageStatus = check_salvage_path(model);
+    display(['PASS...', ...
+        'Function check_salvage_path ran without error']);
+    
+    if salvageStatus
+        display(['PASS...', ...
+            'Check for salvage pathway returns expected result']);
+    else
+        display(['FAIL...', ...
+            'Check for salvage pathway returns unexpected result']);
+    end
+catch err
+    display(['FAIL...', ...
+        'Function check_salvage_path was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
+
+
+%% Test check_model_function with mouse
+
 % load('mouseModel');
-% load('MouseModel_1');
-% model = format_mouse_model(MouseModel_1);
-% load('precursorMets');
-% changeCobraSolver('glpk');
-% 
-% % Test with default inputs
-% display('## Testing check_model_function with default inputs...')
-% try
-%     genericStatus = check_model_function(model, ...
-%         'requiredMets', precursorMets);
-%     display(['PASS...', ...
-%         'Function check_model_function ran without error']);
-%     
-%     if genericStatus
-%         display(['PASS...', ...
-%             'Check for functionality returns expected result']);
-%     else
-%         display(['FAIL...', ...
-%             'Check for functionality returns unexpected result']);
-%     end
-% catch err
-%     display(['FAIL...', ...
-%         'Function check_model_function was terminated with the error:']);
-%     display(['> ', err.message]);
-% end
-% display('---');
-% 
+load('MouseModel_1');
+model = format_mouse_model(MouseModel_1);
+load('precursorMets');
+changeCobraSolver('glpk');
+
+% Test with default inputs
+display('## Testing check_model_function with default inputs...')
+try
+    genericStatus = check_model_function(model, ...
+        'requiredMets', precursorMets);
+    display(['PASS...', ...
+        'Function check_model_function ran without error']);
+    
+    if genericStatus
+        display(['PASS...', ...
+            'Check for functionality returns expected result']);
+    else
+        display(['FAIL...', ...
+            'Check for functionality returns unexpected result']);
+    end
+catch err
+    display(['FAIL...', ...
+        'Function check_model_function was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
+
 % %%
 % % Test with reactions removed that will prevent function
 % display('## Testing check_model_function with glucose reactions removed...')
