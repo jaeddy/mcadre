@@ -107,3 +107,36 @@ else
     display(['FAIL...', ...
         'Function prune_model encountered error, cannot check output'])
 end
+
+
+%% Test remove_unused_rxns
+
+% Note: not directly part of prune_model, but closely related
+
+% Test with default inputs
+display('## Testing remove_unused_rxns with test pruning outputs...')
+try
+    load('mcadre_results');
+    
+    PMtest = remove_unused_genes(PM);
+    display(['PASS...', ...
+        'Function remove_unused_rxns ran without error']);
+    
+    if exist('PMtest', 'var')
+        if numel(PMtest.genes) == 1282
+            display(['PASS...', ...
+                'Function remove_unused_rxns returns expected result']);
+        else
+            display(['FAIL...', ...
+                'Function remove_unused_rxns returns unexpected result']);
+        end
+    else
+        display(['FAIL...', ...
+            'Function remove_unused_rxns returned error, cannot check output']);
+    end
+catch err
+    display(['FAIL...', ...
+        'Function remove_unused_rxns was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
