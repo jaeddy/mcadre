@@ -13,7 +13,8 @@ model = format_human_model(model);
 inactiveRxns = check_model_consistency(model);
 model_consistent = removeRxns(model, inactiveRxns);
 
-save('humanModel', 'model', 'confidenceScores', 'model_consistent');
+save('../data/humanModel', 'model', 'confidenceScores', 'model_consistent');
+
 
 % Mouse model: update of iMM1415 (from A. Heinken / I. Thiele, March 2012)
 clear
@@ -27,4 +28,16 @@ confidenceScores = model.confidenceScores;
 inactiveRxns = check_model_consistency(model);
 model_consistent = removeRxns(model, inactiveRxns);
 
-save('mouseModel', 'model', 'confidenceScores', 'model_consistent');
+save('../data/mouseModel_nonFunctional', 'model', 'confidenceScores', ...
+    'model_consistent');
+
+
+% Update mouse model to enable generic functionality
+model = update_mouse_model(model);
+confidenceScores = model.confidenceScores;
+
+% create consistent version for testing
+inactiveRxns = check_model_consistency(model);
+model_consistent = removeRxns(model, inactiveRxns);
+
+save('../data/mouseModel', 'model', 'confidenceScores', 'model_consistent');
