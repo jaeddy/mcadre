@@ -12,8 +12,14 @@ All code was tested in **Matlab R2014a**, but should be compatible with earlier 
 + fastFVA<sup>(2)</sup>: available for download [here](https://notendur.hi.is/ithiele/software/fastfva.html)
 + fastcc<sup>(2)</sup>: available for download as part of the FASTCORE package [here](http://wwwen.uni.lu/recherche/fstc/life_sciences_research_unit/research_areas/systems_biology/software)
 
+To run the **mCADRE** method, simply clone this repo and add the directory to your Matlab path. The script `run_mcadre` provides an example of how to call the main function `mcadre`.
+
 <span style=font-size:10pt><sup>2</sup>The fastFVA and fastcc methods perform the same function, so only one is required; the `fastFVA` function uses the `glpk` solver, which comes with the COBRA Toolbox, while `fastcc` uses the `cplex` solver.</span>
 
-To run the code, simply clone this repo and add the directory to your Matlab path. The script `run_mcadre` provides an example of how to call the main function `mcadre`.
-
 ## Inputs
+
+### Generic/global reconstruction
+
+This package comes with two ready-to-use global reconstruction inputs: `humanModel`, which represents *Recon 1*<sup>(3)</sup>, and `mouseModel`, which represents an updated and modified version of *iMM1415*<sup>(4)</sup>. Each model is saved in a `.mat` file, and can be loaded from the `data/` directory. These `.mat` files each also include a variable called `confidenceScores` representing literature/experimental-based confidence assigned to reactions in the generic model by the original authors.
+
+### Tissue-specific expression evidence
