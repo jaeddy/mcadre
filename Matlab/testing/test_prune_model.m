@@ -109,6 +109,29 @@ else
 end
 
 
+%% Test prune_model with fastcc
+
+display('## Testing prune_model with fastcc...');
+
+eta = 1/3;
+method = 2;
+salvageCheck = 1;
+
+try
+    cutoff = 3;
+    [~, PM, cRes] = evalc( ...
+        ['prune_model(GM, P, C, Z, eta, precursorMets, salvageCheck,', ...
+        'method, cutoff);']);
+    display(['PASS...', ...
+        'Function prune_model ran without error']);
+catch err
+    display(['FAIL...', ...
+        'Function prune_model was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
+
+
 %% Test remove_unused_rxns
 
 % Note: not directly part of prune_model, but closely related

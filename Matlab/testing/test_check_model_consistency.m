@@ -1,5 +1,5 @@
 
-load('HR1_CbModel');
+load('humanModel');
 changeCobraSolver('glpk');
 
 %% Test check_core_deadends
@@ -269,6 +269,42 @@ display('## Checking output of check_model_consistency with fastcc...');
 
 if exist('inactiveRxns', 'var')
     if numel(inactiveRxns) == 1273
+        display(['PASS...', ...
+            'Function check_model_consistency returns the expected result']);
+    else
+        display(['FAIL...', ...
+            'Function check_model_consistency returns unexpected result']);
+    end
+else
+    display(['FAIL...', ...
+        'Function check_model_consistency encountered error, no output'])
+end
+
+% Test with fastcc, consistent model
+method = 2;
+r = [];
+deCheck = 0;
+C = {};
+
+display('## Testing check_model_consistency with fastcc, consistent model...');
+
+try
+    [inactiveRxns, time, result] = check_model_consistency(model_consistent, ...
+        method, r, deCheck, C);
+    display(['PASS...', ...
+        'Function check_model_consistency ran without error']);
+catch err
+    display(['FAIL...', ...
+        'Function check_model_consistency was terminated with the error:']);
+    display(['> ', err.message]);
+end
+display('---');
+
+% Check outputs; should find 0 inactive reactions in Recon 1
+display('## Checking output of check_model_consistency with fastcc...');
+
+if exist('inactiveRxns', 'var')
+    if numel(inactiveRxns) == 0
         display(['PASS...', ...
             'Function check_model_consistency returns the expected result']);
     else

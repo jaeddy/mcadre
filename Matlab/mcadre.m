@@ -1,16 +1,16 @@
 function [GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
-    mcadre(model, G, U, confidenceScores, C_H_genes, method)
+    mcadre(model, G, U, confidenceScores, salvageCheck, C_H_genes, method)
 
 % Inputs
 % - model: original generic model
 % - G: list of genes in expression data
 % - U: ubiquity scores corresponding to genes in G
-% - confidenceScores: 
+% - confidenceScores: literature-based evidence for generic model reactions
+% - salvageCheck: option flag for whether to perform functional check for the
+%                 nucleotide salvage pathway (1) or not (0)
 % - C_H_genes: predefined high confidence reactions (optional)
-% - 
-% - requiredMets: id (model.mets) - NEED TO ADD THIS STILL
-% - biomass: id (model.rxns) of biomass reaction (optional)
-% - keepMedia: option (1 or 0) of whether to keep current model inputs
+% - method: 1 = use fastFVA (glpk) to check consistency; 2 = use fastcc & cplex
+
 
 % Outputs
 % - GM: generic model (after removing blocked reactions)
@@ -18,11 +18,9 @@ function [GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
 % - NC: non-core reactions in GM
 % - PM: pruned, context-specific model
 % - Z: reactions with zero expression (i.e., measured zero, not just
-%      missing from expression data
-% - inactiveRxns: blocked reactions in the original generic model
+%      missing from expression data)
 % - model_C: core reactions in the original model (including blocked)
 % - pruneTime: total reaction pruning time
-% - cTime: function time spent in checkModelConsistency module
 % - cRes: result of model checks (consistency/function)
 %       - vs. +: reaction r removed from generic model or not
 %       1 vs. 2: reaction r had zero or non-zero expression evidence
@@ -33,8 +31,16 @@ function [GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
 %       3: removal of reaction r by itself prevented production of required
 %          metabolites (therefore was not removed)
 
-if nargin < 6
+if nargin < 7
     method = 1; % fastFVA
+end
+
+if nargin < 6
+    C_H_genes = [];
+end
+
+if nargin < 5
+    salvageCheck = 1;
 end
 
 %% Generate order for reaction removal

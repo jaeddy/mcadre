@@ -292,14 +292,12 @@ display('---');
 
 %% Test check_model_function with mouse
 
-% load('mouseModel');
-load('MouseModel_1');
-model = format_mouse_model(MouseModel_1);
+load('mouseModel');
 load('precursorMets');
 changeCobraSolver('glpk');
 
 % Test with default inputs
-display('## Testing check_model_function with default inputs...')
+display('## Testing check_model_function (mouse) with default inputs...')
 try
     genericStatus = check_model_function(model, ...
         'requiredMets', precursorMets);
@@ -320,29 +318,28 @@ catch err
 end
 display('---');
 
-% %%
-% % Test with reactions removed that will prevent function
-% display('## Testing check_model_function with glucose reactions removed...')
-% 
-% glcRxns = findRxnsFromMets(model, 'glc_D[e]');
-% glcRxns = setdiff(glcRxns, 'EX_glc(e)');
-% modelR = removeRxns(model, glcRxns);
-% 
-% try
-%     genericStatus = check_model_function(modelR, ...
-%         'requiredMets', precursorMets);
-%     display(['PASS...', ...
-%         'Function check_model_function ran without error']);
-%     
-%     if ~genericStatus
-%         display(['PASS...', ...
-%             'Check for functionality returns expected result']);
-%     else
-%         display(['FAIL...', ...
-%             'Check for functionality returns unexpected result']);
-%     end
-% catch err
-%     display(['FAIL...', ...
-%         'Function check_model_function was terminated with the error:']);
-%     display(['> ', err.message]);
-% end
+% Test with reactions removed that will prevent function
+display('## Testing check_model_function with glucose reactions removed...')
+
+glcRxns = findRxnsFromMets(model, 'glc_D[e]');
+glcRxns = setdiff(glcRxns, 'EX_glc(e)');
+modelR = removeRxns(model, glcRxns);
+
+try
+    genericStatus = check_model_function(modelR, ...
+        'requiredMets', precursorMets);
+    display(['PASS...', ...
+        'Function check_model_function ran without error']);
+    
+    if ~genericStatus
+        display(['PASS...', ...
+            'Check for functionality returns expected result']);
+    else
+        display(['FAIL...', ...
+            'Check for functionality returns unexpected result']);
+    end
+catch err
+    display(['FAIL...', ...
+        'Function check_model_function was terminated with the error:']);
+    display(['> ', err.message]);
+end
