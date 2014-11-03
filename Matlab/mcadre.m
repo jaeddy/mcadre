@@ -24,9 +24,9 @@ function [GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
 % - cRes: result of model checks (consistency/function)
 %       - vs. +: reaction r removed from generic model or not
 %       1 vs. 2: reaction r had zero or non-zero expression evidence
-%       x.1 vs. x.2: removal of reaction r did not or did create metabolite
-%                    dead ends
-%       x.x1 vs. x.x0: precursor production possible after removal of 
+%       -x.y: removal of reaction r corresponded with removal of y (num.) total
+%            core reactions
+%       +x.1 vs. x.0: precursor production possible after removal of 
 %                      reaction r or not
 %       3: removal of reaction r by itself prevented production of required
 %          metabolites (therefore was not removed)
