@@ -16,5 +16,5 @@ salvageCheck = 1;
 
 %% Run mcadre
 
-[GM, C, NC, PM, Z, model_C, pruneTime, cRes] = ...
+[PM, GM, C, NC, Z, model_C, pruneTime, cRes] = ...
     mcadre(model, G, U, confidenceScores, salvageCheck, C_H_genes, method);
