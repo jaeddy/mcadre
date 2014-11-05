@@ -5,7 +5,6 @@ clc
 %% Load input data
 load('testInputs');
 load('humanModel');
-load('precursorMets');
 changeCobraSolver('glpk');
 
 %% Set parameters for mcadre
