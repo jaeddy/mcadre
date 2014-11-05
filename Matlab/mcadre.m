@@ -13,10 +13,10 @@ function [PM, GM, C, NC, Z, model_C, pruneTime, cRes] = ...
 
 
 % Outputs
+% - PM: pruned, context-specific model
 % - GM: generic model (after removing blocked reactions)
 % - C: core reactions in GM
 % - NC: non-core reactions in GM
-% - PM: pruned, context-specific model
 % - Z: reactions with zero expression (i.e., measured zero, not just
 %      missing from expression data)
 % - model_C: core reactions in the original model (including blocked)
